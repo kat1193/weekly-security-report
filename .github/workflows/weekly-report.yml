@@ -22,28 +22,37 @@ jobs:
         env:
           ADO_PAT: ${{ secrets.ADO_PAT }}
         run: |
-          curl -s -u ":$ADO_PAT" \
+          curl -s --globoff -u ":$ADO_PAT" \
             -H "Content-Type: application/json" \
+            -w "\nHTTP status: %{http_code}\n" \
             -d '{"query": "SELECT [System.Id] FROM WorkItems WHERE [System.Tags] CONTAINS \"SEC-REQ\" AND [System.State] IN (\"To Do\",\"Doing\")"}' \
             "https://dev.azure.com/testbedcns/PRBN3336/_apis/wit/wiql?api-version=7.1" \
             -o todo-items.json
 
-          curl -s -u ":$ADO_PAT" \
+          curl -s --globoff -u ":$ADO_PAT" \
             -H "Content-Type: application/json" \
+            -w "\nHTTP status: %{http_code}\n" \
             -d '{"query": "SELECT [System.Id] FROM WorkItems WHERE [System.Tags] CONTAINS \"SEC-REQ\" AND [System.State] = \"Done\""}' \
             "https://dev.azure.com/testbedcns/PRBN3336/_apis/wit/wiql?api-version=7.1" \
             -o done-items.json
+
+          echo "--- todo-items.json ---" && cat todo-items.json
+          echo "--- done-items.json ---" && cat done-items.json
 
       - name: Install Claude Code
         run: npm install -g @anthropic-ai/claude-code
 
       # Claude only ever sees the two JSON files above — never the PAT,
       # never a curl command containing it.
+      # --dangerously-skip-permissions is safe specifically here: this is a
+      # disposable, isolated CI container with nothing beyond this repo
+      # checkout — not a flag to use on a real machine or a session with
+      # broader filesystem/credential access.
       - name: Update pptx from queried data
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
-          claude -p "Read todo-items.json and done-items.json in this repo
+          claude -p --dangerously-skip-permissions "Read todo-items.json and done-items.json in this repo
           — each contains an Azure DevOps WIQL result with a workItems
           array. Count the items in each. Open
           Weekly_Technical_Status_Report.pptx and update the slide 10
