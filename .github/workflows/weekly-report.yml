@@ -17,7 +17,7 @@ jobs:
       - name: Run report update
         env:
           ADO_PAT: ${{ secrets.ADO_PAT }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
           claude -p "Query the Azure DevOps REST API at
           https://dev.azure.com/testbedcns/PRBN3336/_apis/wit/wiql using the PAT
