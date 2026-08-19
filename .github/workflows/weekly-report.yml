@@ -1,0 +1,36 @@
+name: Weekly Security Requirements Report
+
+on:
+  schedule:
+    - cron: '0 15 * * 5'   # 5pm Athens time (UTC+2) on Fridays — cron runs in UTC
+  workflow_dispatch: {}     # allows manual runs for testing
+
+jobs:
+  update-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run report update
+        env:
+          ADO_PAT: ${{ secrets.ADO_PAT }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude -p "Query the Azure DevOps REST API at
+          https://dev.azure.com/{org}/{project}/_apis/wit/wiql using the PAT
+          in \$ADO_PAT. List all [SEC-REQ]-tagged work items in To Do phase
+          and all in Done phase. Open Weekly_Technical_Status_Report.pptx in
+          this repo and update the slide 10 chart: To Do items as
+          'Security Requirements Identified', Done items as
+          'Security Requirements Implemented'. Save the file in place."
+
+      - name: Commit updated PPTX
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add Weekly_Technical_Status_Report.pptx
+          git commit -m "Weekly security requirements update" || echo "No changes"
+          git push
