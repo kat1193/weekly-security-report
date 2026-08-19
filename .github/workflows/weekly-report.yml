@@ -20,7 +20,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           claude -p "Query the Azure DevOps REST API at
-          https://dev.azure.com/{org}/{project}/_apis/wit/wiql using the PAT
+          https://dev.azure.com/testbedcns/PRBN3336/_apis/wit/wiql using the PAT
           in \$ADO_PAT. List all [SEC-REQ]-tagged work items in To Do phase
           and all in Done phase. Open Weekly_Technical_Status_Report.pptx in
           this repo and update the slide 10 chart: To Do items as
