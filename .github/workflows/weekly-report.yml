@@ -25,13 +25,13 @@ jobs:
           curl -s -u ":$ADO_PAT" \
             -H "Content-Type: application/json" \
             -d '{"query": "SELECT [System.Id] FROM WorkItems WHERE [System.Tags] CONTAINS \"SEC-REQ\" AND [System.State] IN (\"To Do\",\"Doing\")"}' \
-            "https://dev.azure.com/{org}/{project}/_apis/wit/wiql?api-version=7.1" \
+            "https://dev.azure.com/testbedcns/PRBN3336/_apis/wit/wiql?api-version=7.1" \
             -o todo-items.json
 
           curl -s -u ":$ADO_PAT" \
             -H "Content-Type: application/json" \
             -d '{"query": "SELECT [System.Id] FROM WorkItems WHERE [System.Tags] CONTAINS \"SEC-REQ\" AND [System.State] = \"Done\""}' \
-            "https://dev.azure.com/{org}/{project}/_apis/wit/wiql?api-version=7.1" \
+            "https://dev.azure.com/testbedcns/PRBN3336/_apis/wit/wiql?api-version=7.1" \
             -o done-items.json
 
       - name: Install Claude Code
